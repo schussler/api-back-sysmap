@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+            https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="008-create-user-achievements" author="sysmap">
+        <createTable tableName="user_achievements">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="achievement_id" type="UUID">
+                <constraints nullable="false" foreignKeyName="fk_ua_achievement"
+                             references="achievements(id)"/>
+            </column>
+            <column name="user_id" type="UUID">
+                <constraints nullable="false" foreignKeyName="fk_ua_user"
+                             references="users(id)"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint tableName="user_achievements"
+                             columnNames="user_id, achievement_id"
+                             constraintName="uq_user_achievement"/>
+    </changeSet>
+
+</databaseChangeLog>

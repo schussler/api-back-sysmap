@@ -1,0 +1,44 @@
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/platform}
+    username: ${POSTGRES_USER:platform}
+    password: ${POSTGRES_PASSWORD:platform}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.xml
+
+server:
+  port: ${SERVER_PORT:8080}
+
+jwt:
+  secret: ${JWT_SECRET:bootcamp-secret-2026-chave-minima-32chars}
+  expiration: ${JWT_EXPIRATION:86400000}
+
+cloud:
+  aws:
+    s3:
+      bucket: ${S3_BUCKET:platform-images}
+      endpoint: ${S3_ENDPOINT:http://localhost:4566}
+    credentials:
+      access-key: ${AWS_ACCESS_KEY:test}
+      secret-key: ${AWS_SECRET_KEY:test}
+    region:
+      static: ${AWS_REGION:us-east-1}
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs
+
+xp:
+  per-checkin-participant: ${XP_PER_CHECKIN_PARTICIPANT:50}
+  per-checkin-creator: ${XP_PER_CHECKIN_CREATOR:30}
+  per-level: ${XP_PER_LEVEL:200}

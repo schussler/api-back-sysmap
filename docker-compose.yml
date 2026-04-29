@@ -1,0 +1,61 @@
+services:
+  postgres:
+    image: postgres:16
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  localstack:
+    image: localstack/localstack:latest
+    restart: unless-stopped
+    ports:
+      - "4566:4566"
+    environment:
+      SERVICES: s3
+      DEFAULT_REGION: ${AWS_REGION:-us-east-1}
+      AWS_DEFAULT_REGION: ${AWS_REGION:-us-east-1}
+    volumes:
+      - localstack_data:/var/lib/localstack
+
+  app:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "${SERVER_PORT:-8080}:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      localstack:
+        condition: service_started
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-86400000}
+      S3_ENDPOINT: http://localstack:4566
+      S3_BUCKET: ${S3_BUCKET:-platform-images}
+      AWS_ACCESS_KEY: ${AWS_ACCESS_KEY:-test}
+      AWS_SECRET_KEY: ${AWS_SECRET_KEY:-test}
+      AWS_REGION: ${AWS_REGION:-us-east-1}
+      SERVER_PORT: 8080
+      XP_PER_CHECKIN_PARTICIPANT: ${XP_PER_CHECKIN_PARTICIPANT:-50}
+      XP_PER_CHECKIN_CREATOR: ${XP_PER_CHECKIN_CREATOR:-30}
+      XP_PER_LEVEL: ${XP_PER_LEVEL:-200}
+
+volumes:
+  postgres_data:
+  localstack_data:

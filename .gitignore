@@ -1,0 +1,30 @@
+# Ambiente
+.env
+
+# Build
+target/
+*.jar
+*.class
+*.war
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+.classpath
+.project
+.settings/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Maven
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
