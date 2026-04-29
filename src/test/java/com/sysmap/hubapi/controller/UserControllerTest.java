@@ -1,10 +1,8 @@
 package com.sysmap.hubapi.controller;
 
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-@AutoConfigureMockMvc
 class UserControllerTest {
     // TODO: shouldReturn200WithUserData
     // TODO: shouldReturn200WithUserPreferences
