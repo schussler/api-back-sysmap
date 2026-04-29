@@ -7,12 +7,14 @@
 
     <changeSet id="004-create-activity-addresses" author="sysmap">
         <createTable tableName="activity_addresses">
-            <column name="id" type="UUID">
+            <column name="id" type="UUID" defaultValueComputed="gen_random_uuid()">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="activity_id" type="UUID">
-                <constraints nullable="false" unique="true"
-                             foreignKeyName="fk_address_activity"
+                <constraints nullable="false"
+                             unique="true"
+                             uniqueConstraintName="uq_activity_addresses_activity_id"
+                             foreignKeyName="fk_activity_addresses_activity_id"
                              references="activities(id)"/>
             </column>
             <column name="latitude" type="DOUBLE PRECISION">

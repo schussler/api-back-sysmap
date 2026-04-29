@@ -7,21 +7,25 @@
 
     <changeSet id="006-create-preferences" author="sysmap">
         <createTable tableName="preferences">
-            <column name="id" type="UUID">
+            <column name="id" type="UUID" defaultValueComputed="gen_random_uuid()">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="user_id" type="UUID">
-                <constraints nullable="false" foreignKeyName="fk_preference_user"
+                <constraints nullable="false"
+                             foreignKeyName="fk_preferences_user_id"
                              references="users(id)"/>
             </column>
             <column name="type_id" type="UUID">
-                <constraints nullable="false" foreignKeyName="fk_preference_type"
+                <constraints nullable="false"
+                             foreignKeyName="fk_preferences_type_id"
                              references="activity_types(id)"/>
             </column>
         </createTable>
-        <addUniqueConstraint tableName="preferences"
-                             columnNames="user_id, type_id"
-                             constraintName="uq_preference_user_type"/>
+
+        <addUniqueConstraint
+                tableName="preferences"
+                columnNames="user_id, type_id"
+                constraintName="uq_preferences_user_type"/>
     </changeSet>
 
 </databaseChangeLog>

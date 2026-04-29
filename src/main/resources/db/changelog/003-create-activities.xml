@@ -7,7 +7,7 @@
 
     <changeSet id="003-create-activities" author="sysmap">
         <createTable tableName="activities">
-            <column name="id" type="UUID">
+            <column name="id" type="UUID" defaultValueComputed="gen_random_uuid()">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="title" type="VARCHAR(255)">
@@ -17,7 +17,8 @@
                 <constraints nullable="false"/>
             </column>
             <column name="type_id" type="UUID">
-                <constraints nullable="false" foreignKeyName="fk_activity_type"
+                <constraints nullable="false"
+                             foreignKeyName="fk_activities_type_id"
                              references="activity_types(id)"/>
             </column>
             <column name="confirmation_code" type="VARCHAR(6)">
@@ -38,7 +39,8 @@
                 <constraints nullable="false"/>
             </column>
             <column name="creator_id" type="UUID">
-                <constraints nullable="false" foreignKeyName="fk_activity_creator"
+                <constraints nullable="false"
+                             foreignKeyName="fk_activities_creator_id"
                              references="users(id)"/>
             </column>
         </createTable>

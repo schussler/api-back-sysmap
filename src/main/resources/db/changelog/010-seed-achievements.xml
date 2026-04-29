@@ -7,27 +7,27 @@
 
     <changeSet id="010-seed-achievements" author="sysmap">
         <insert tableName="achievements">
-            <column name="id" value="22222222-2222-2222-2222-222222222001"/>
+            <column name="id" valueComputed="gen_random_uuid()"/>
             <column name="name" value="Primeiro Passo"/>
             <column name="criterion" value="Faça check-in em uma atividade pela primeira vez"/>
         </insert>
         <insert tableName="achievements">
-            <column name="id" value="22222222-2222-2222-2222-222222222002"/>
+            <column name="id" valueComputed="gen_random_uuid()"/>
             <column name="name" value="Organizador"/>
             <column name="criterion" value="Crie uma atividade pela primeira vez"/>
         </insert>
         <insert tableName="achievements">
-            <column name="id" value="22222222-2222-2222-2222-222222222003"/>
+            <column name="id" valueComputed="gen_random_uuid()"/>
             <column name="name" value="Mestre de Cerimônias"/>
             <column name="criterion" value="Conclua uma atividade pela primeira vez"/>
         </insert>
         <insert tableName="achievements">
-            <column name="id" value="22222222-2222-2222-2222-222222222004"/>
+            <column name="id" valueComputed="gen_random_uuid()"/>
             <column name="name" value="Fotogênico"/>
             <column name="criterion" value="Altere sua foto de perfil pela primeira vez"/>
         </insert>
         <insert tableName="achievements">
-            <column name="id" value="22222222-2222-2222-2222-222222222005"/>
+            <column name="id" valueComputed="gen_random_uuid()"/>
             <column name="name" value="Veterano"/>
             <column name="criterion" value="Alcance o nível 5"/>
         </insert>

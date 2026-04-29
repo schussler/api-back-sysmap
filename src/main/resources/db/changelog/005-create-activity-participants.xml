@@ -7,15 +7,17 @@
 
     <changeSet id="005-create-activity-participants" author="sysmap">
         <createTable tableName="activity_participants">
-            <column name="id" type="UUID">
+            <column name="id" type="UUID" defaultValueComputed="gen_random_uuid()">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="activity_id" type="UUID">
-                <constraints nullable="false" foreignKeyName="fk_participant_activity"
+                <constraints nullable="false"
+                             foreignKeyName="fk_activity_participants_activity_id"
                              references="activities(id)"/>
             </column>
             <column name="user_id" type="UUID">
-                <constraints nullable="false" foreignKeyName="fk_participant_user"
+                <constraints nullable="false"
+                             foreignKeyName="fk_activity_participants_user_id"
                              references="users(id)"/>
             </column>
             <column name="approved" type="BOOLEAN" defaultValueBoolean="false">
@@ -23,9 +25,11 @@
             </column>
             <column name="confirmed_at" type="TIMESTAMP"/>
         </createTable>
-        <addUniqueConstraint tableName="activity_participants"
-                             columnNames="activity_id, user_id"
-                             constraintName="uq_participant_activity_user"/>
+
+        <addUniqueConstraint
+                tableName="activity_participants"
+                columnNames="activity_id, user_id"
+                constraintName="uq_activity_participants_activity_user"/>
     </changeSet>
 
 </databaseChangeLog>

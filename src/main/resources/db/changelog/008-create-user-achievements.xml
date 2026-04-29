@@ -7,21 +7,25 @@
 
     <changeSet id="008-create-user-achievements" author="sysmap">
         <createTable tableName="user_achievements">
-            <column name="id" type="UUID">
+            <column name="id" type="UUID" defaultValueComputed="gen_random_uuid()">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="achievement_id" type="UUID">
-                <constraints nullable="false" foreignKeyName="fk_ua_achievement"
-                             references="achievements(id)"/>
-            </column>
             <column name="user_id" type="UUID">
-                <constraints nullable="false" foreignKeyName="fk_ua_user"
+                <constraints nullable="false"
+                             foreignKeyName="fk_user_achievements_user_id"
                              references="users(id)"/>
             </column>
+            <column name="achievement_id" type="UUID">
+                <constraints nullable="false"
+                             foreignKeyName="fk_user_achievements_achievement_id"
+                             references="achievements(id)"/>
+            </column>
         </createTable>
-        <addUniqueConstraint tableName="user_achievements"
-                             columnNames="user_id, achievement_id"
-                             constraintName="uq_user_achievement"/>
+
+        <addUniqueConstraint
+                tableName="user_achievements"
+                columnNames="user_id, achievement_id"
+                constraintName="uq_user_achievements_user_achievement"/>
     </changeSet>
 
 </databaseChangeLog>
