@@ -94,12 +94,6 @@
             <artifactId>s3</artifactId>
             <version>${aws.sdk.version}</version>
         </dependency>
-        <dependency>
-            <groupId>software.amazon.awssdk</groupId>
-            <artifactId>url-connection-http-client</artifactId>
-            <version>${aws.sdk.version}</version>
-        </dependency>
-
         <!-- Lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
