@@ -4,6 +4,9 @@ spring:
     username: ${POSTGRES_USER:platform}
     password: ${POSTGRES_PASSWORD:platform}
     driver-class-name: org.postgresql.Driver
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-master.xml
   jpa:
     hibernate:
       ddl-auto: validate
@@ -11,8 +14,6 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-  liquibase:
-    change-log: classpath:db/changelog/db.changelog-master.xml
 
 server:
   port: ${SERVER_PORT:8080}

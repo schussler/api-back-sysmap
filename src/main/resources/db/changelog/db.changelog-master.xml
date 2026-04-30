@@ -5,15 +5,15 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
             https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
 
-    <include file="db/changelog/001-create-users.xml"/>
-    <include file="db/changelog/002-create-activity-types.xml"/>
-    <include file="db/changelog/003-create-activities.xml"/>
-    <include file="db/changelog/004-create-activity-addresses.xml"/>
-    <include file="db/changelog/005-create-activity-participants.xml"/>
-    <include file="db/changelog/006-create-preferences.xml"/>
-    <include file="db/changelog/007-create-achievements.xml"/>
-    <include file="db/changelog/008-create-user-achievements.xml"/>
-    <include file="db/changelog/009-seed-activity-types.xml"/>
-    <include file="db/changelog/010-seed-achievements.xml"/>
+    <include file="001-create-users.xml"               relativeToChangelogFile="true"/>
+    <include file="002-create-activity-types.xml"      relativeToChangelogFile="true"/>
+    <include file="003-create-activities.xml"          relativeToChangelogFile="true"/>
+    <include file="004-create-activity-addresses.xml"  relativeToChangelogFile="true"/>
+    <include file="005-create-activity-participants.xml" relativeToChangelogFile="true"/>
+    <include file="006-create-preferences.xml"         relativeToChangelogFile="true"/>
+    <include file="007-create-achievements.xml"        relativeToChangelogFile="true"/>
+    <include file="008-create-user-achievements.xml"   relativeToChangelogFile="true"/>
+    <include file="009-seed-activity-types.xml"        relativeToChangelogFile="true"/>
+    <include file="010-seed-achievements.xml"          relativeToChangelogFile="true"/>
 
 </databaseChangeLog>
