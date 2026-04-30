@@ -1,25 +1,175 @@
 package com.sysmap.hubapi.controller;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.sysmap.hubapi.dto.response.*;
+import com.sysmap.hubapi.service.ActivityService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/activities")
+@SecurityRequirement(name = "bearerAuth")
+@Tag(name = "Atividades", description = "Gerenciamento de atividades")
 public class ActivityController {
-    // TODO: GET /activities/types
-    // TODO: GET /activities
-    // TODO: GET /activities/all
-    // TODO: GET /activities/user/creator
-    // TODO: GET /activities/user/creator/all
-    // TODO: GET /activities/user/participant
-    // TODO: GET /activities/user/participant/all
-    // TODO: GET /activities/{id}/participants
-    // TODO: POST /activities/new
-    // TODO: PUT /activities/{id}/update
-    // TODO: PUT /activities/{id}/conclude
-    // TODO: PUT /activities/{id}/approve
-    // TODO: PUT /activities/{id}/check-in
-    // TODO: POST /activities/{id}/subscribe
-    // TODO: DELETE /activities/{id}/unsubscribe
-    // TODO: DELETE /activities/{id}/delete
+
+    private final ActivityService activityService;
+
+    public ActivityController(ActivityService activityService) {
+        this.activityService = activityService;
+    }
+
+    @GetMapping("/types")
+    @Operation(summary = "Lista todos os tipos de atividade")
+    public List<ActivityTypeResponse> listTypes() {
+        return activityService.listTypes();
+    }
+
+    @GetMapping
+    @Operation(summary = "Lista atividades disponíveis (paginado)")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Listagem retornada"),
+            @ApiResponse(responseCode = "401", description = "Não autenticado"),
+            @ApiResponse(responseCode = "500", description = "Erro inesperado")
+    })
+    public PagedActivityResponse listActivities(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int pageSize,
+            @RequestParam(required = false) UUID typeId,
+            @RequestParam(defaultValue = "createdAt") String orderBy,
+            @RequestParam(defaultValue = "desc") String order) {
+        return activityService.listActivities(page, pageSize, typeId, orderBy, order);
+    }
+
+    @GetMapping("/all")
+    @Operation(summary = "Lista todas as atividades disponíveis (sem paginação)")
+    public List<ActivityResponse> listAll(
+            @RequestParam(required = false) UUID typeId,
+            @RequestParam(defaultValue = "createdAt") String orderBy,
+            @RequestParam(defaultValue = "desc") String order) {
+        return activityService.listAllActivities(typeId, orderBy, order);
+    }
+
+    @GetMapping("/user/creator")
+    @Operation(summary = "Lista atividades criadas pelo usuário logado (paginado)")
+    public PagedActivityResponse listCreatedByUser(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int pageSize) {
+        return activityService.listCreatedByUser(page, pageSize);
+    }
+
+    @GetMapping("/user/creator/all")
+    @Operation(summary = "Lista todas as atividades criadas pelo usuário logado")
+    public List<ActivityResponse> listAllCreatedByUser() {
+        return activityService.listAllCreatedByUser();
+    }
+
+    @GetMapping("/user/participant")
+    @Operation(summary = "Lista atividades em que o usuário logado participa (paginado)")
+    public PagedActivityResponse listParticipatedByUser(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int pageSize) {
+        return activityService.listParticipatedByUser(page, pageSize);
+    }
+
+    @GetMapping("/user/participant/all")
+    @Operation(summary = "Lista todas as atividades em que o usuário logado participa")
+    public List<ActivityResponse> listAllParticipatedByUser() {
+        return activityService.listAllParticipatedByUser();
+    }
+
+    @GetMapping("/{id}/participants")
+    @Operation(summary = "Lista participantes de uma atividade")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Participantes retornados"),
+            @ApiResponse(responseCode = "404", description = "Atividade não encontrada"),
+            @ApiResponse(responseCode = "500", description = "Erro inesperado")
+    })
+    public List<ParticipantResponse> listParticipants(@PathVariable UUID id) {
+        return activityService.listParticipants(id);
+    }
+
+    @PostMapping(value = "/new", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Cria uma nova atividade")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Atividade criada"),
+            @ApiResponse(responseCode = "400", description = "Campos inválidos ou imagem inválida"),
+            @ApiResponse(responseCode = "401", description = "Não autenticado"),
+            @ApiResponse(responseCode = "500", description = "Erro inesperado")
+    })
+    public ActivityResponse createActivity(
+            @RequestParam String title,
+            @RequestParam String description,
+            @RequestParam UUID typeId,
+            @RequestParam String address,
+            @RequestParam MultipartFile image,
+            @RequestParam String scheduledDate,
+            @RequestParam(name = "private") boolean isPrivate) {
+        return activityService.createActivity(
+                title, description, typeId, address, image,
+                LocalDateTime.parse(scheduledDate), isPrivate);
+    }
+
+    @PutMapping(value = "/{id}/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "Edita uma atividade existente (apenas o criador)")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Atividade atualizada"),
+            @ApiResponse(responseCode = "403", description = "Não é o criador"),
+            @ApiResponse(responseCode = "404", description = "Atividade não encontrada"),
+            @ApiResponse(responseCode = "500", description = "Erro inesperado")
+    })
+    public ActivityResponse updateActivity(
+            @PathVariable UUID id,
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) String description,
+            @RequestParam(required = false) UUID typeId,
+            @RequestParam(required = false) String address,
+            @RequestParam(required = false) MultipartFile image,
+            @RequestParam(required = false) String scheduledDate,
+            @RequestParam(name = "private", required = false) Boolean isPrivate) {
+        return activityService.updateActivity(id, title, description, typeId, address,
+                image, scheduledDate, isPrivate);
+    }
+
+    @PutMapping("/{id}/conclude")
+    @Operation(summary = "Conclui a atividade (apenas o criador)")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Atividade concluída"),
+            @ApiResponse(responseCode = "403", description = "Não é o criador"),
+            @ApiResponse(responseCode = "404", description = "Atividade não encontrada"),
+            @ApiResponse(responseCode = "500", description = "Erro inesperado")
+    })
+    public MessageResponse concludeActivity(@PathVariable UUID id) {
+        activityService.concludeActivity(id);
+        return new MessageResponse("Atividade concluída com sucesso.");
+    }
+
+    @DeleteMapping("/{id}/delete")
+    @Operation(summary = "Exclui (soft delete) a atividade (apenas o criador)")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Atividade excluída"),
+            @ApiResponse(responseCode = "403", description = "Não é o criador"),
+            @ApiResponse(responseCode = "404", description = "Atividade não encontrada"),
+            @ApiResponse(responseCode = "500", description = "Erro inesperado")
+    })
+    public MessageResponse deleteActivity(@PathVariable UUID id) {
+        activityService.deleteActivity(id);
+        return new MessageResponse("Atividade excluída com sucesso.");
+    }
+
+    // Endpoints de participação implementados em ParticipantService (próximo passo)
+    // PUT /{id}/approve
+    // PUT /{id}/check-in
+    // POST /{id}/subscribe
+    // DELETE /{id}/unsubscribe
 }
