@@ -1,0 +1,34 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/platform
+    username: platform
+    password: platform
+    driver-class-name: org.postgresql.Driver
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-master.xml
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+
+cloud:
+  aws:
+    s3:
+      bucket: platform-images
+      endpoint: http://localhost:4566
+      public-url: http://localhost:4566
+    credentials:
+      access-key: test
+      secret-key: test
+    region:
+      static: us-east-1
+
+jwt:
+  secret: test-secret-key-for-integration-tests-minimum-32chars
+  expiration: 86400000
+
+xp:
+  per-checkin-participant: 50
+  per-checkin-creator: 30
+  per-level: 200
