@@ -7,10 +7,14 @@ import com.sysmap.hubapi.dto.response.PreferenceResponse;
 import com.sysmap.hubapi.dto.response.UserResponse;
 import com.sysmap.hubapi.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -66,7 +70,7 @@ public class UserController {
         userService.definePreferences(typeIds);
     }
 
-    @PutMapping("/avatar")
+    @PutMapping(value = "/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Atualiza foto de perfil (PNG ou JPG)")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Avatar atualizado"),
@@ -75,7 +79,11 @@ public class UserController {
             @ApiResponse(responseCode = "403", description = "Conta desativada"),
             @ApiResponse(responseCode = "500", description = "Erro inesperado")
     })
-    public AvatarResponse updateAvatar(@RequestParam("avatar") MultipartFile file) {
+    public AvatarResponse updateAvatar(
+            @Parameter(description = "Imagem PNG ou JPG", required = true,
+                       content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,
+                                          schema = @Schema(type = "string", format = "binary")))
+            @RequestParam("avatar") MultipartFile file) {
         return userService.updateAvatar(file);
     }
 
