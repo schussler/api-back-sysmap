@@ -36,15 +36,22 @@ public class ActivityController {
 
     @GetMapping("/types")
     @Operation(summary = "Lista todos os tipos de atividade")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Tipos retornados"),
+            @ApiResponse(responseCode = "401", description = "Não autenticado"),
+            @ApiResponse(responseCode = "403", description = "Conta desativada"),
+            @ApiResponse(responseCode = "500", description = "Erro inesperado")
+    })
     public List<ActivityTypeResponse> listTypes() {
         return activityService.listTypes();
     }
 
     @GetMapping
-    @Operation(summary = "Lista atividades disponíveis (paginado)")
+    @Operation(summary = "Lista atividades disponíveis com paginação e filtro por tipo")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Listagem retornada"),
             @ApiResponse(responseCode = "401", description = "Não autenticado"),
+            @ApiResponse(responseCode = "403", description = "Conta desativada"),
             @ApiResponse(responseCode = "500", description = "Erro inesperado")
     })
     public PagedActivityResponse listActivities(
@@ -57,7 +64,13 @@ public class ActivityController {
     }
 
     @GetMapping("/all")
-    @Operation(summary = "Lista todas as atividades disponíveis (sem paginação)")
+    @Operation(summary = "Lista todas as atividades disponíveis sem paginação")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Listagem retornada"),
+            @ApiResponse(responseCode = "401", description = "Não autenticado"),
+            @ApiResponse(responseCode = "403", description = "Conta desativada"),
+            @ApiResponse(responseCode = "500", description = "Erro inesperado")
+    })
     public List<ActivityResponse> listAll(
             @RequestParam(required = false) UUID typeId,
             @RequestParam(defaultValue = "createdAt") String orderBy,
@@ -67,6 +80,12 @@ public class ActivityController {
 
     @GetMapping("/user/creator")
     @Operation(summary = "Lista atividades criadas pelo usuário logado (paginado)")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Listagem retornada"),
+            @ApiResponse(responseCode = "401", description = "Não autenticado"),
+            @ApiResponse(responseCode = "403", description = "Conta desativada"),
+            @ApiResponse(responseCode = "500", description = "Erro inesperado")
+    })
     public PagedActivityResponse listCreatedByUser(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int pageSize) {
@@ -75,12 +94,24 @@ public class ActivityController {
 
     @GetMapping("/user/creator/all")
     @Operation(summary = "Lista todas as atividades criadas pelo usuário logado")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Listagem retornada"),
+            @ApiResponse(responseCode = "401", description = "Não autenticado"),
+            @ApiResponse(responseCode = "403", description = "Conta desativada"),
+            @ApiResponse(responseCode = "500", description = "Erro inesperado")
+    })
     public List<ActivityResponse> listAllCreatedByUser() {
         return activityService.listAllCreatedByUser();
     }
 
     @GetMapping("/user/participant")
-    @Operation(summary = "Lista atividades em que o usuário logado participa (paginado)")
+    @Operation(summary = "Lista atividades em que o usuário logado está inscrito (paginado)")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Listagem retornada"),
+            @ApiResponse(responseCode = "401", description = "Não autenticado"),
+            @ApiResponse(responseCode = "403", description = "Conta desativada"),
+            @ApiResponse(responseCode = "500", description = "Erro inesperado")
+    })
     public PagedActivityResponse listParticipatedByUser(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int pageSize) {
@@ -88,15 +119,23 @@ public class ActivityController {
     }
 
     @GetMapping("/user/participant/all")
-    @Operation(summary = "Lista todas as atividades em que o usuário logado participa")
+    @Operation(summary = "Lista todas as atividades em que o usuário logado está inscrito")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Listagem retornada"),
+            @ApiResponse(responseCode = "401", description = "Não autenticado"),
+            @ApiResponse(responseCode = "403", description = "Conta desativada"),
+            @ApiResponse(responseCode = "500", description = "Erro inesperado")
+    })
     public List<ActivityResponse> listAllParticipatedByUser() {
         return activityService.listAllParticipatedByUser();
     }
 
     @GetMapping("/{id}/participants")
-    @Operation(summary = "Lista participantes de uma atividade")
+    @Operation(summary = "Lista participantes de uma atividade específica")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Participantes retornados"),
+            @ApiResponse(responseCode = "401", description = "Não autenticado"),
+            @ApiResponse(responseCode = "403", description = "Conta desativada"),
             @ApiResponse(responseCode = "404", description = "Atividade não encontrada"),
             @ApiResponse(responseCode = "500", description = "Erro inesperado")
     })
@@ -106,11 +145,12 @@ public class ActivityController {
 
     @PostMapping(value = "/new", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    @Operation(summary = "Cria uma nova atividade")
+    @Operation(summary = "Cria nova atividade com upload de imagem no S3")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Atividade criada"),
-            @ApiResponse(responseCode = "400", description = "Campos inválidos ou imagem inválida"),
+            @ApiResponse(responseCode = "400", description = "Campos inválidos ou formato de imagem inválido"),
             @ApiResponse(responseCode = "401", description = "Não autenticado"),
+            @ApiResponse(responseCode = "403", description = "Conta desativada"),
             @ApiResponse(responseCode = "500", description = "Erro inesperado")
     })
     public ActivityResponse createActivity(
@@ -127,10 +167,12 @@ public class ActivityController {
     }
 
     @PutMapping(value = "/{id}/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @Operation(summary = "Edita uma atividade existente (apenas o criador)")
+    @Operation(summary = "Edita atividade existente — todos os campos opcionais (apenas o criador)")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Atividade atualizada"),
-            @ApiResponse(responseCode = "403", description = "Não é o criador"),
+            @ApiResponse(responseCode = "400", description = "Formato de imagem inválido"),
+            @ApiResponse(responseCode = "401", description = "Não autenticado"),
+            @ApiResponse(responseCode = "403", description = "Não é o criador ou conta desativada"),
             @ApiResponse(responseCode = "404", description = "Atividade não encontrada"),
             @ApiResponse(responseCode = "500", description = "Erro inesperado")
     })
@@ -148,10 +190,11 @@ public class ActivityController {
     }
 
     @PutMapping("/{id}/conclude")
-    @Operation(summary = "Conclui a atividade (apenas o criador)")
+    @Operation(summary = "Conclui a atividade — impede novas inscrições e check-ins (apenas o criador)")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Atividade concluída"),
-            @ApiResponse(responseCode = "403", description = "Não é o criador"),
+            @ApiResponse(responseCode = "200", description = "Atividade concluída com sucesso"),
+            @ApiResponse(responseCode = "401", description = "Não autenticado"),
+            @ApiResponse(responseCode = "403", description = "Não é o criador ou conta desativada"),
             @ApiResponse(responseCode = "404", description = "Atividade não encontrada"),
             @ApiResponse(responseCode = "500", description = "Erro inesperado")
     })
@@ -160,27 +203,46 @@ public class ActivityController {
         return new MessageResponse("Atividade concluída com sucesso.");
     }
 
-    @DeleteMapping("/{id}/delete")
-    @Operation(summary = "Exclui (soft delete) a atividade (apenas o criador)")
+    @PutMapping("/{id}/approve")
+    @Operation(summary = "Aprova ou nega inscrição de participante em atividade privada (apenas o criador)")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Atividade excluída"),
-            @ApiResponse(responseCode = "403", description = "Não é o criador"),
-            @ApiResponse(responseCode = "404", description = "Atividade não encontrada"),
+            @ApiResponse(responseCode = "200", description = "Inscrição atualizada"),
+            @ApiResponse(responseCode = "400", description = "Campos obrigatórios não informados"),
+            @ApiResponse(responseCode = "401", description = "Não autenticado"),
+            @ApiResponse(responseCode = "403", description = "Não é o criador ou conta desativada"),
+            @ApiResponse(responseCode = "404", description = "Atividade ou participante não encontrado"),
             @ApiResponse(responseCode = "500", description = "Erro inesperado")
     })
-    public MessageResponse deleteActivity(@PathVariable UUID id) {
-        activityService.deleteActivity(id);
-        return new MessageResponse("Atividade excluída com sucesso.");
+    public void approve(@PathVariable UUID id, @RequestBody ApproveRequest request) {
+        participantService.approve(id, request);
+    }
+
+    @PutMapping("/{id}/check-in")
+    @Operation(summary = "Confirma presença na atividade com código de confirmação")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Participação confirmada com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Código de confirmação incorreto ou não informado"),
+            @ApiResponse(responseCode = "401", description = "Não autenticado"),
+            @ApiResponse(responseCode = "403", description = "Participante não aprovado ou conta desativada"),
+            @ApiResponse(responseCode = "404", description = "Atividade não encontrada"),
+            @ApiResponse(responseCode = "409", description = "Check-in já realizado"),
+            @ApiResponse(responseCode = "422", description = "Atividade já concluída"),
+            @ApiResponse(responseCode = "500", description = "Erro inesperado")
+    })
+    public MessageResponse checkIn(@PathVariable UUID id, @RequestBody @Valid CheckInRequest request) {
+        participantService.checkIn(id, request);
+        return new MessageResponse("Participação confirmada com sucesso.");
     }
 
     @PostMapping("/{id}/subscribe")
-    @Operation(summary = "Inscreve o usuário logado na atividade")
+    @Operation(summary = "Inscreve o usuário logado na atividade (pública: aprovação automática; privada: pendente)")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Inscrição realizada"),
-            @ApiResponse(responseCode = "403", description = "Criador não pode se inscrever"),
+            @ApiResponse(responseCode = "401", description = "Não autenticado"),
+            @ApiResponse(responseCode = "403", description = "Conta desativada"),
             @ApiResponse(responseCode = "404", description = "Atividade não encontrada"),
-            @ApiResponse(responseCode = "409", description = "Já inscrito ou atividade concluída"),
-            @ApiResponse(responseCode = "422", description = "Atividade concluída"),
+            @ApiResponse(responseCode = "409", description = "Já inscrito"),
+            @ApiResponse(responseCode = "422", description = "Atividade concluída ou criador tentando se inscrever"),
             @ApiResponse(responseCode = "500", description = "Erro inesperado")
     })
     public SubscriptionResponse subscribe(@PathVariable UUID id) {
@@ -190,9 +252,11 @@ public class ActivityController {
     @DeleteMapping("/{id}/unsubscribe")
     @Operation(summary = "Cancela inscrição do usuário logado na atividade")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Inscrição cancelada"),
+            @ApiResponse(responseCode = "200", description = "Participação cancelada com sucesso"),
+            @ApiResponse(responseCode = "401", description = "Não autenticado"),
+            @ApiResponse(responseCode = "403", description = "Conta desativada"),
             @ApiResponse(responseCode = "404", description = "Atividade ou inscrição não encontrada"),
-            @ApiResponse(responseCode = "422", description = "Check-in já confirmado"),
+            @ApiResponse(responseCode = "422", description = "Presença já confirmada — não é possível cancelar"),
             @ApiResponse(responseCode = "500", description = "Erro inesperado")
     })
     public MessageResponse unsubscribe(@PathVariable UUID id) {
@@ -200,31 +264,17 @@ public class ActivityController {
         return new MessageResponse("Participação cancelada com sucesso.");
     }
 
-    @PutMapping("/{id}/approve")
-    @Operation(summary = "Aprova ou nega inscrição em atividade privada (apenas o criador)")
+    @DeleteMapping("/{id}/delete")
+    @Operation(summary = "Exclui a atividade com soft delete (apenas o criador)")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Inscrição atualizada"),
-            @ApiResponse(responseCode = "403", description = "Não é o criador"),
-            @ApiResponse(responseCode = "404", description = "Atividade ou participante não encontrado"),
-            @ApiResponse(responseCode = "500", description = "Erro inesperado")
-    })
-    public void approve(@PathVariable UUID id, @RequestBody ApproveRequest request) {
-        participantService.approve(id, request);
-    }
-
-    @PutMapping("/{id}/check-in")
-    @Operation(summary = "Confirma presença na atividade com código")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Presença confirmada"),
-            @ApiResponse(responseCode = "400", description = "Código incorreto ou inválido"),
-            @ApiResponse(responseCode = "403", description = "Participante não aprovado"),
+            @ApiResponse(responseCode = "200", description = "Atividade excluída com sucesso"),
+            @ApiResponse(responseCode = "401", description = "Não autenticado"),
+            @ApiResponse(responseCode = "403", description = "Não é o criador ou conta desativada"),
             @ApiResponse(responseCode = "404", description = "Atividade não encontrada"),
-            @ApiResponse(responseCode = "409", description = "Check-in já realizado"),
-            @ApiResponse(responseCode = "422", description = "Atividade concluída"),
             @ApiResponse(responseCode = "500", description = "Erro inesperado")
     })
-    public MessageResponse checkIn(@PathVariable UUID id, @RequestBody @Valid CheckInRequest request) {
-        participantService.checkIn(id, request);
-        return new MessageResponse("Participação confirmada com sucesso.");
+    public MessageResponse deleteActivity(@PathVariable UUID id) {
+        activityService.deleteActivity(id);
+        return new MessageResponse("Atividade excluída com sucesso.");
     }
 }
