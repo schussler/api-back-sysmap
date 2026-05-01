@@ -12,6 +12,7 @@ import com.sysmap.hubapi.exception.WrongPasswordException;
 import com.sysmap.hubapi.repository.UserAchievementRepository;
 import com.sysmap.hubapi.repository.UserRepository;
 import com.sysmap.hubapi.security.JwtTokenProvider;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +20,12 @@ import java.util.List;
 
 @Service
 public class AuthService {
+
+    @Value("${cloud.aws.s3.public-url}")
+    private String s3PublicUrl;
+
+    @Value("${cloud.aws.s3.bucket}")
+    private String s3Bucket;
 
     private final UserRepository userRepository;
     private final UserAchievementRepository userAchievementRepository;
@@ -45,7 +52,7 @@ public class AuthService {
                 .email(request.email())
                 .cpf(request.cpf())
                 .password(passwordEncoder.encode(request.password()))
-                .avatar("default-avatar")
+                .avatar(s3PublicUrl + "/" + s3Bucket + "/avatars/default-avatar.png")
                 .xp(0)
                 .level(1)
                 .build();
