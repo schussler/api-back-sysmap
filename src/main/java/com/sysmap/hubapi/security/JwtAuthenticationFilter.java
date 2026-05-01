@@ -71,8 +71,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private void writeForbidden(HttpServletResponse response) throws IOException {
+        String body = "{\"error\":\"Esta conta foi desativada e não pode ser utilizada.\"}";
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         response.setContentType("application/json;charset=UTF-8");
-        response.getWriter().write("{\"error\":\"Esta conta foi desativada e não pode ser utilizada.\"}");
+        response.setContentLength(body.getBytes(java.nio.charset.StandardCharsets.UTF_8).length);
+        response.getWriter().write(body);
+        response.getWriter().flush();
     }
 }
