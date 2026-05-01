@@ -24,6 +24,7 @@ cloud:
     s3:
       bucket: ${S3_BUCKET:platform-images}
       endpoint: ${S3_ENDPOINT:http://localhost:4566}
+      public-url: ${S3_PUBLIC_URL:http://localhost:4566}
     credentials:
       access-key: ${AWS_ACCESS_KEY:test}
       secret-key: ${AWS_SECRET_KEY:test}

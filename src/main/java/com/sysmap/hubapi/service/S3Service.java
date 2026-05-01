@@ -22,6 +22,9 @@ public class S3Service {
     @Value("${cloud.aws.s3.endpoint}")
     private String endpoint;
 
+    @Value("${cloud.aws.s3.public-url:${cloud.aws.s3.endpoint}}")
+    private String publicUrl;
+
     public S3Service(S3Client s3Client) {
         this.s3Client = s3Client;
     }
@@ -44,7 +47,7 @@ public class S3Service {
             throw new RuntimeException("Falha ao fazer upload da imagem.", e);
         }
 
-        return endpoint + "/" + bucket + "/" + key;
+        return publicUrl + "/" + bucket + "/" + key;
     }
 
     public void validateImageFormat(MultipartFile file) {
