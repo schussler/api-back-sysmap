@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+            https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="011-add-indexes" author="sysmap">
+
+        <!-- users: email e cpf já têm índice implícito via UNIQUE constraint -->
+
+        <!-- activities: colunas de filtragem e join mais frequentes -->
+        <createIndex tableName="activities" indexName="idx_activities_creator_id">
+            <column name="creator_id"/>
+        </createIndex>
+
+        <createIndex tableName="activities" indexName="idx_activities_type_id">
+            <column name="type_id"/>
+        </createIndex>
+
+        <!-- Índice parcial equivalente para deleted_at IS NULL e completed_at IS NULL
+             não é suportado por Liquibase de forma portável; criamos índices simples -->
+        <createIndex tableName="activities" indexName="idx_activities_deleted_at">
+            <column name="deleted_at"/>
+        </createIndex>
+
+        <createIndex tableName="activities" indexName="idx_activities_completed_at">
+            <column name="completed_at"/>
+        </createIndex>
+
+        <!-- activity_participants: join e contagem por activity e user -->
+        <createIndex tableName="activity_participants"
+                     indexName="idx_activity_participants_activity_id">
+            <column name="activity_id"/>
+        </createIndex>
+
+        <createIndex tableName="activity_participants"
+                     indexName="idx_activity_participants_user_id">
+            <column name="user_id"/>
+        </createIndex>
+
+        <!-- preferences: lookup por usuário -->
+        <createIndex tableName="preferences" indexName="idx_preferences_user_id">
+            <column name="user_id"/>
+        </createIndex>
+
+        <!-- user_achievements: lookup por usuário -->
+        <createIndex tableName="user_achievements" indexName="idx_user_achievements_user_id">
+            <column name="user_id"/>
+        </createIndex>
+
+    </changeSet>
+
+</databaseChangeLog>

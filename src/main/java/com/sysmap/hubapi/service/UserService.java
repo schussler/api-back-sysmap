@@ -49,11 +49,13 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public UserResponse getAuthenticatedUser() {
         User user = currentUser();
         return toUserResponse(user);
     }
 
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public List<PreferenceResponse> getPreferences() {
         User user = currentUser();
         return preferenceRepository.findByUserId(user.getId()).stream()

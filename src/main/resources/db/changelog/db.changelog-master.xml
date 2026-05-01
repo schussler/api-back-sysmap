@@ -15,5 +15,6 @@
     <include file="008-create-user-achievements.xml"   relativeToChangelogFile="true"/>
     <include file="009-seed-activity-types.xml"        relativeToChangelogFile="true"/>
     <include file="010-seed-achievements.xml"          relativeToChangelogFile="true"/>
+    <include file="011-add-indexes.xml"                relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

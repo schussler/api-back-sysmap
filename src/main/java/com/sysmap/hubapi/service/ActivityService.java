@@ -52,6 +52,7 @@ public class ActivityService {
 
     // ── Tipos ─────────────────────────────────────────────────────────────
 
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public List<ActivityTypeResponse> listTypes() {
         return activityTypeRepository.findAll().stream()
                 .map(t -> new ActivityTypeResponse(t.getId(), t.getName(), t.getDescription(), t.getImage()))
@@ -60,6 +61,7 @@ public class ActivityService {
 
     // ── Listagem paginada ─────────────────────────────────────────────────
 
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public PagedActivityResponse listActivities(int page, int pageSize, UUID typeId,
                                                 String orderBy, String order) {
         User user = currentUser();
@@ -88,6 +90,7 @@ public class ActivityService {
 
     // ── Listagem sem paginação ────────────────────────────────────────────
 
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public List<ActivityResponse> listAllActivities(UUID typeId, String orderBy, String order) {
         User user = currentUser();
         Sort sort = buildSort(orderBy, order);
@@ -99,6 +102,7 @@ public class ActivityService {
 
     // ── Atividades do criador ─────────────────────────────────────────────
 
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public PagedActivityResponse listCreatedByUser(int page, int pageSize) {
         User user = currentUser();
         Pageable pageable = PageRequest.of(page - 1, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"));
@@ -106,6 +110,7 @@ public class ActivityService {
         return toPagedResponse(result, page, pageSize, user);
     }
 
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public List<ActivityResponse> listAllCreatedByUser() {
         User user = currentUser();
         return activityRepository
@@ -115,6 +120,7 @@ public class ActivityService {
 
     // ── Atividades do participante ────────────────────────────────────────
 
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public PagedActivityResponse listParticipatedByUser(int page, int pageSize) {
         User user = currentUser();
         Pageable pageable = PageRequest.of(page - 1, pageSize);
@@ -122,6 +128,7 @@ public class ActivityService {
         return toPagedResponse(result, page, pageSize, user);
     }
 
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public List<ActivityResponse> listAllParticipatedByUser() {
         User user = currentUser();
         return activityRepository.findAllByParticipantUserId(user.getId())
@@ -130,6 +137,7 @@ public class ActivityService {
 
     // ── Participantes de uma atividade ────────────────────────────────────
 
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public List<ParticipantResponse> listParticipants(UUID activityId) {
         Activity activity = findActivityOrThrow(activityId);
         return activityParticipantRepository.findByActivityIdWithUser(activity.getId())
