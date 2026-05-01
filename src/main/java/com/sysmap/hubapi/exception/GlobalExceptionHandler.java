@@ -81,6 +81,12 @@ public class GlobalExceptionHandler {
         return new ErrorResponse(ex.getMessage());
     }
 
+    @ExceptionHandler(ParticipantNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handleParticipantNotFound(ParticipantNotFoundException ex) {
+        return new ErrorResponse(ex.getMessage());
+    }
+
     @ExceptionHandler(DuplicateUserException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse handleDuplicateUser(DuplicateUserException ex) {

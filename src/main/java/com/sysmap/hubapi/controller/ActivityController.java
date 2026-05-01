@@ -1,7 +1,11 @@
 package com.sysmap.hubapi.controller;
 
+import com.sysmap.hubapi.dto.request.ApproveRequest;
+import com.sysmap.hubapi.dto.request.CheckInRequest;
 import com.sysmap.hubapi.dto.response.*;
 import com.sysmap.hubapi.service.ActivityService;
+import com.sysmap.hubapi.service.ParticipantService;
+import jakarta.validation.Valid;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -23,9 +27,11 @@ import java.util.UUID;
 public class ActivityController {
 
     private final ActivityService activityService;
+    private final ParticipantService participantService;
 
-    public ActivityController(ActivityService activityService) {
+    public ActivityController(ActivityService activityService, ParticipantService participantService) {
         this.activityService = activityService;
+        this.participantService = participantService;
     }
 
     @GetMapping("/types")
@@ -167,9 +173,58 @@ public class ActivityController {
         return new MessageResponse("Atividade excluída com sucesso.");
     }
 
-    // Endpoints de participação implementados em ParticipantService (próximo passo)
-    // PUT /{id}/approve
-    // PUT /{id}/check-in
-    // POST /{id}/subscribe
-    // DELETE /{id}/unsubscribe
+    @PostMapping("/{id}/subscribe")
+    @Operation(summary = "Inscreve o usuário logado na atividade")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Inscrição realizada"),
+            @ApiResponse(responseCode = "403", description = "Criador não pode se inscrever"),
+            @ApiResponse(responseCode = "404", description = "Atividade não encontrada"),
+            @ApiResponse(responseCode = "409", description = "Já inscrito ou atividade concluída"),
+            @ApiResponse(responseCode = "422", description = "Atividade concluída"),
+            @ApiResponse(responseCode = "500", description = "Erro inesperado")
+    })
+    public SubscriptionResponse subscribe(@PathVariable UUID id) {
+        return participantService.subscribe(id);
+    }
+
+    @DeleteMapping("/{id}/unsubscribe")
+    @Operation(summary = "Cancela inscrição do usuário logado na atividade")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Inscrição cancelada"),
+            @ApiResponse(responseCode = "404", description = "Atividade ou inscrição não encontrada"),
+            @ApiResponse(responseCode = "422", description = "Check-in já confirmado"),
+            @ApiResponse(responseCode = "500", description = "Erro inesperado")
+    })
+    public MessageResponse unsubscribe(@PathVariable UUID id) {
+        participantService.unsubscribe(id);
+        return new MessageResponse("Participação cancelada com sucesso.");
+    }
+
+    @PutMapping("/{id}/approve")
+    @Operation(summary = "Aprova ou nega inscrição em atividade privada (apenas o criador)")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Inscrição atualizada"),
+            @ApiResponse(responseCode = "403", description = "Não é o criador"),
+            @ApiResponse(responseCode = "404", description = "Atividade ou participante não encontrado"),
+            @ApiResponse(responseCode = "500", description = "Erro inesperado")
+    })
+    public void approve(@PathVariable UUID id, @RequestBody ApproveRequest request) {
+        participantService.approve(id, request);
+    }
+
+    @PutMapping("/{id}/check-in")
+    @Operation(summary = "Confirma presença na atividade com código")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Presença confirmada"),
+            @ApiResponse(responseCode = "400", description = "Código incorreto ou inválido"),
+            @ApiResponse(responseCode = "403", description = "Participante não aprovado"),
+            @ApiResponse(responseCode = "404", description = "Atividade não encontrada"),
+            @ApiResponse(responseCode = "409", description = "Check-in já realizado"),
+            @ApiResponse(responseCode = "422", description = "Atividade concluída"),
+            @ApiResponse(responseCode = "500", description = "Erro inesperado")
+    })
+    public MessageResponse checkIn(@PathVariable UUID id, @RequestBody @Valid CheckInRequest request) {
+        participantService.checkIn(id, request);
+        return new MessageResponse("Participação confirmada com sucesso.");
+    }
 }
