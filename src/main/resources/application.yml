@@ -41,3 +41,7 @@ xp:
   per-checkin-participant: ${XP_PER_CHECKIN_PARTICIPANT:50}
   per-checkin-creator: ${XP_PER_CHECKIN_CREATOR:30}
   per-level: ${XP_PER_LEVEL:200}
+
+rate-limit:
+  max-requests: 10
+  window-ms: 60000

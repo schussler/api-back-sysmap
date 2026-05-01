@@ -16,7 +16,10 @@ class UserControllerTest extends AbstractIntegrationTest {
 
     private final String s = java.util.UUID.randomUUID().toString().replace("-", "").substring(0, 8);
     private String email(String p) { return p + s + "@test.com"; }
-    private String cpf(String d)   { return d.substring(0,3)+"."+d.substring(3,6)+"."+d.substring(6,9)+"-"+s.substring(0,2); }
+    private String cpf(String d) {
+        String suffix = String.format("%02d", Math.abs(s.hashCode()) % 100);
+        return d.substring(0,3)+"."+d.substring(3,6)+"."+d.substring(6,9)+"-"+suffix;
+    }
 
     @Test
     void shouldReturn200WithUserData() {

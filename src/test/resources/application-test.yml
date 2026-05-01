@@ -32,3 +32,7 @@ xp:
   per-checkin-participant: 50
   per-checkin-creator: 30
   per-level: 200
+
+rate-limit:
+  max-requests: 10000
+  window-ms: 60000

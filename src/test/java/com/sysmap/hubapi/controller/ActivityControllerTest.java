@@ -20,9 +20,14 @@ class ActivityControllerTest extends AbstractIntegrationTest {
 
     @BeforeEach
     void setUpUsers() {
-        String s = UUID.randomUUID().toString().replace("-", "").substring(0, 8);
-        creatorToken     = signUp("Criador",     "cria" + s + "@t.com", "1" + s + "01", "pass");
-        participantToken = signUp("Participante","part" + s + "@t.com", "2" + s + "02", "pass");
+        String s  = UUID.randomUUID().toString().replace("-", "").substring(0, 12);
+        long v    = Long.parseUnsignedLong(s.substring(0, 8), 16);
+        String cpf1 = String.format("%03d.%03d.%03d-%02d",
+                v % 1000, (v >> 10) % 1000, (v >> 20) % 1000, (v >> 30) % 100);
+        String cpf2 = String.format("%03d.%03d.%03d-%02d",
+                (v + 1) % 1000, ((v + 1) >> 10) % 1000, ((v + 1) >> 20) % 1000, ((v + 1) >> 30) % 100);
+        creatorToken     = signUp("Criador",      "cria" + s + "@t.com", cpf1, "senha123!");
+        participantToken = signUp("Participante", "part" + s + "@t.com", cpf2, "senha123!");
 
         var typesResp = restTemplate.exchange(
                 baseUrl("/activities/types"), HttpMethod.GET,
