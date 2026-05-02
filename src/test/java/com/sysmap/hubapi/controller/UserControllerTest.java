@@ -14,11 +14,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class UserControllerTest extends AbstractIntegrationTest {
 
-    private final String s = java.util.UUID.randomUUID().toString().replace("-", "").substring(0, 8);
+    private final String s = java.util.UUID.randomUUID().toString().replace("-", "").substring(0, 12);
     private String email(String p) { return p + s + "@test.com"; }
-    private String cpf(String d) {
-        String suffix = String.format("%02d", Math.abs(s.hashCode()) % 100);
-        return d.substring(0,3)+"."+d.substring(3,6)+"."+d.substring(6,9)+"-"+suffix;
+    private String cpf(String variant) {
+        long base = Long.parseUnsignedLong(s.substring(0, 8), 16);
+        long hash = Math.abs((long) variant.hashCode()); // always non-negative
+        long v = base + hash;
+        return String.format("%03d.%03d.%03d-%02d",
+                v % 1000, (v >> 10) % 1000, (v >> 20) % 1000, (v >> 30) % 100);
     }
 
     @Test

@@ -111,4 +111,30 @@ class AuthControllerTest extends AbstractIntegrationTest {
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
+
+    @Test
+    void shouldReturn403WhenSignInWithDeactivatedAccount() {
+        String e = email("deact");
+        // 1. Registra
+        restTemplate.postForEntity(baseUrl("/auth/register"),
+                new RegisterRequest("Deact", e, cpf("777777777"), "senha12345"),
+                Void.class);
+        // 2. Faz login para obter token
+        String token = restTemplate.postForEntity(baseUrl("/auth/sign-in"),
+                new SignInRequest(e, "senha12345"), com.sysmap.hubapi.dto.response.SignInResponse.class)
+                .getBody().token();
+        // 3. Desativa a conta
+        var deactivateHeaders = new org.springframework.http.HttpHeaders();
+        deactivateHeaders.setBearerAuth(token);
+        restTemplate.exchange(baseUrl("/user/deactivate"),
+                org.springframework.http.HttpMethod.DELETE,
+                new org.springframework.http.HttpEntity<>(deactivateHeaders), Void.class);
+        // 4. Tenta sign-in → deve retornar 403
+        var response = restTemplate.postForEntity(
+                baseUrl("/auth/sign-in"),
+                new SignInRequest(e, "senha12345"),
+                Object.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+    }
 }
