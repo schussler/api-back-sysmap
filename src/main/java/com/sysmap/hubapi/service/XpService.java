@@ -7,6 +7,7 @@ import com.sysmap.hubapi.repository.UserAchievementRepository;
 import com.sysmap.hubapi.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class XpService {
@@ -32,6 +33,7 @@ public class XpService {
         this.userAchievementRepository = userAchievementRepository;
     }
 
+    @Transactional
     public void grantCheckInXp(User participant, User creator) {
         participant.setXp(participant.getXp() + xpPerCheckinParticipant);
         checkLevelUp(participant);
