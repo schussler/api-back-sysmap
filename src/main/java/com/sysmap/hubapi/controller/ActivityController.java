@@ -213,8 +213,9 @@ public class ActivityController {
             @ApiResponse(responseCode = "404", description = "Atividade ou participante não encontrado"),
             @ApiResponse(responseCode = "500", description = "Erro inesperado")
     })
-    public void approve(@PathVariable UUID id, @RequestBody ApproveRequest request) {
+    public MessageResponse approve(@PathVariable UUID id, @RequestBody ApproveRequest request) {
         participantService.approve(id, request);
+        return new MessageResponse("Inscrição atualizada com sucesso.");
     }
 
     @PutMapping("/{id}/check-in")
