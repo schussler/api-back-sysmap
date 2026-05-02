@@ -8,6 +8,8 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.BucketAlreadyExistsException;
+import software.amazon.awssdk.services.s3.model.BucketAlreadyOwnedByYouException;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.InputStream;
@@ -29,9 +31,25 @@ public class ApplicationStartupRunner implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) {
+        ensureBucketExists();
+        uploadDefaultAvatar();
+    }
+
+    private void ensureBucketExists() {
+        try {
+            s3Client.createBucket(b -> b.bucket(bucket));
+            log.info("Bucket S3 '{}' criado.", bucket);
+        } catch (BucketAlreadyOwnedByYouException | BucketAlreadyExistsException e) {
+            log.debug("Bucket '{}' já existe.", bucket);
+        } catch (Exception e) {
+            log.warn("Não foi possível criar o bucket '{}': {}", bucket, e.getMessage());
+        }
+    }
+
+    private void uploadDefaultAvatar() {
         try (InputStream is = getClass().getResourceAsStream("/default-avatar.png")) {
             if (is == null) {
-                log.warn("default-avatar.png não encontrado nos resources — avatar padrão não será configurado.");
+                log.warn("default-avatar.png não encontrado nos resources.");
                 return;
             }
             byte[] bytes = is.readAllBytes();
