@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -96,7 +97,7 @@ public class UserController {
             @ApiResponse(responseCode = "409", description = "E-mail já utilizado por outro usuário"),
             @ApiResponse(responseCode = "500", description = "Erro inesperado")
     })
-    public UserResponse updateUser(@RequestBody UpdateUserRequest request) {
+    public UserResponse updateUser(@RequestBody @Valid UpdateUserRequest request) {
         return userService.updateUser(request);
     }
 
