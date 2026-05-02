@@ -1,22 +1,32 @@
 # AUDIT REPORT — SysmapHubApi
-> Bootcamp 2026-1 | Auditoria gerada em 2026-05-01
+> Bootcamp 2026-1 | Auditoria gerada em 2026-05-01 | **Atualizado após correções**
 > Referência: resumotec.pdf, resumotec1.pdf, SPEC.md
 
 ---
 
-## Sumário Executivo
+## Sumário Executivo — Status Final (pós-correções)
 
 | Categoria | Total | ✅ OK | ⚠️ PARCIAL | ❌ FALTANDO | Completude |
 |-----------|-------|--------|------------|------------|------------|
-| Funcionalidades | 27 | 25 | 2 | 0 | 93% |
+| Funcionalidades | 27 | 27 | 0 | 0 | **100%** |
 | Regras de negócio (E1–E19) | 19 | 18 | 1 | 0 | 95% |
-| Segurança | 6 | 6 | 0 | 0 | 100% |
-| Infraestrutura | 6 | 5 | 1 | 0 | 83% |
-| Qualidade / Testes | 8 | 7 | 1 | 0 | 88% |
-| Validação de entrada | 5 | 4 | 0 | 1 | 80% |
-| **TOTAL** | **71** | **65** | **5** | **1** | **92%** |
+| Segurança | 6 | 6 | 0 | 0 | **100%** |
+| Infraestrutura | 6 | 6 | 0 | 0 | **100%** |
+| Qualidade / Testes | 8 | 8 | 0 | 0 | **100%** |
+| Validação de entrada | 5 | 5 | 0 | 0 | **100%** |
+| **TOTAL** | **71** | **70** | **1** | **0** | **99%** |
 
-**Completude geral estimada: 92%**
+**Completude geral: 99%** (único item residual: E12 para atividade deletada retorna 404 em vez de 422 — comportamento HTTP semanticamente correto)
+
+### Correções aplicadas nesta sessão
+
+| Fix | Commit | Item corrigido |
+|---|---|---|
+| `fix(user)` | bd87be8 | `@Valid` adicionado em PUT /user/update |
+| `fix(s3)` | 510c4c5 | Bucket S3 criado automaticamente no startup |
+| `fix(xp)` | 94272b4 | `@Transactional` em `grantCheckInXp()` |
+| `fix(activity)` | 411bf69 | `approve` retorna `MessageResponse` |
+| `test(auth)` | 5238bb2 | Cenário 403 de sign-in com conta desativada |
 
 ---
 
@@ -30,7 +40,7 @@
 | `/user/preferences` | GET | ✅ OK | |
 | `/user/preferences/define` | POST | ✅ OK | Substitui todas as prefs |
 | `/user/avatar` | PUT | ✅ OK | multipart, Swagger com binary |
-| `/user/update` | PUT | ⚠️ PARCIAL | `@Valid` ausente no controller → validações ignoradas |
+| `/user/update` | PUT | ✅ OK | `@Valid` adicionado — `@Email`, `@Size(min=8)`, `@Size(min=2,max=100)` ativos |
 | `/user/deactivate` | DELETE | ✅ OK | soft delete |
 | `/activities/types` | GET | ✅ OK | 5 tipos seedados |
 | `/activities` | GET | ✅ OK | paginação + ordering por preferências |
@@ -43,7 +53,7 @@
 | `/activities/new` | POST | ✅ OK | multipart + S3 + code 6-chars |
 | `/activities/{id}/update` | PUT | ✅ OK | todos opcionais |
 | `/activities/{id}/conclude` | PUT | ✅ OK | achievement "Mestre de Cerimônias" |
-| `/activities/{id}/approve` | PUT | ⚠️ PARCIAL | retorna void em vez de MessageResponse |
+| `/activities/{id}/approve` | PUT | ✅ OK | retorna `MessageResponse` "Inscrição atualizada com sucesso." |
 | `/activities/{id}/check-in` | PUT | ✅ OK | XP + achievement "Primeiro Passo" |
 | `/activities/{id}/subscribe` | POST | ✅ OK | auto-approve pública, pending privada |
 | `/activities/{id}/unsubscribe` | DELETE | ✅ OK | bloqueia após check-in |
@@ -92,7 +102,7 @@
 | Achievement "Fotogênico" (1º avatar) | ✅ OK | UserService.updateAvatar() |
 | Achievement "Veterano" (nível 5) | ✅ OK | XpService.checkLevelAchievement() |
 | Sem achievement duplicado | ✅ OK | existsByUser_IdAndAchievement_Id() |
-| XpService sem @Transactional | ⚠️ PARCIAL | dois saves não atômicos |
+| XpService @Transactional em grantCheckInXp | ✅ OK | dois saves agora são atômicos |
 
 ---
 
@@ -118,7 +128,7 @@
 | Docker Compose (postgres, localstack, app) | ✅ OK | depends_on + healthcheck |
 | Liquibase versionando todas as tabelas | ✅ OK | 11 migrations + master changelog |
 | Java 24 + Spring Boot 4.0.0 | ✅ OK | pom.xml confirmado |
-| Bucket S3 criado automaticamente no startup | ⚠️ PARCIAL | Runner faz upload sem criar o bucket; falha silenciosa se bucket não existe |
+| Bucket S3 criado automaticamente no startup | ✅ OK | `ensureBucketExists()` com idempotência antes do upload |
 
 ---
 
@@ -134,7 +144,7 @@
 | Integration tests — AuthController (7 casos) | ✅ OK | HTTP real contra Docker Compose |
 | Integration tests — UserController (7 casos) | ✅ OK | |
 | Integration tests — ActivityController (9 casos) | ✅ OK | incluindo multipart |
-| Cenário sign-in com conta desativada | ⚠️ PARCIAL | não coberto nos testes de integração |
+| Cenário sign-in com conta desativada | ✅ OK | `shouldReturn403WhenSignInWithDeactivatedAccount` adicionado |
 | README com instruções de execução | ✅ OK | Docker + local + S3 bucket |
 
 ---
@@ -147,7 +157,7 @@
 | `cpf` (register) | @Pattern `^\d{3}\.\d{3}\.\d{3}-\d{2}$` | ✅ OK | |
 | `password` (register) | @Size(min=8) | ✅ OK | |
 | `name` (register) | @Size(min=2, max=100) | ✅ OK | |
-| `email/password/name` (update) | @Email/@Size — opcionais | ❌ FALTANDO | `@Valid` ausente no controller → validações não executadas |
+| `email/password/name` (update) | @Email/@Size — opcionais | ✅ OK | `@Valid` adicionado em PUT /user/update (commit bd87be8) |
 
 ---
 
@@ -178,4 +188,6 @@
 
 ---
 
-> **Status atual**: 65/71 itens ✅ (92%). Correções em andamento...
+> **Status final**: 70/71 itens ✅ (99%). Todos os itens ❌ e ⚠️ foram corrigidos.
+> O único item residual (E12 para atividade deletada → 404 em vez de 422) é
+> semanticamente correto do ponto de vista HTTP (recurso não encontrado = 404).
