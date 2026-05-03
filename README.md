@@ -13,7 +13,7 @@ API REST para a Plataforma de Atividades do Bootcamp 2026-1.
 
 ```bash
 # 1. Clone o repositório
-git clone <url-do-repositorio>
+git clone https://github.com/schussler/api-back-sysmap
 cd sysmap-hub-api
 
 # 2. Copie e edite as variáveis de ambiente
